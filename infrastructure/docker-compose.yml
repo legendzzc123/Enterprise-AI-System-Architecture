@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  model_server:
+    build:
+      context: ..
+      dockerfile: infrastructure/Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - REDIS_HOST=redis
+    depends_on:
+      - redis
+    networks:
+      - easa_network
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    networks:
+      - easa_network
+
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - easa_network
+
+networks:
+  easa_network:
+    driver: bridge
